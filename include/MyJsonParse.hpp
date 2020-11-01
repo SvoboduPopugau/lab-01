@@ -1,6 +1,6 @@
 // Copyright 2018 Your Name <your_email>
-#ifndef INCLUDE_HEADER_HPP_
-#define INCLUDE_HEADER_HPP_
+#ifndef INCLUDE_MYJSONPARSE_HPP_
+#define INCLUDE_MYJSONPARSE_HPP_
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <sstream>
@@ -10,6 +10,7 @@
 #include <variant>
 #include <cstring>
 #include <iterator>
+#include <string>
 
 using json = nlohmann::json;
 struct Item
@@ -60,4 +61,4 @@ class MyJsonParse {
 //    std::string MyTestString;
     Students* StudList;
 };
-#endif // INCLUDE_HEADER_HPP_
+#endif  // INCLUDE_MYJSONPARSE_HPP_
