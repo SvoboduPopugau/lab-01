@@ -25,8 +25,6 @@ void MyJsonParse::set_data(std::string& s)
   if(!file)
     throw std::runtime_error("Unable to open file: " + s);
   this->data = json::parse(file);
-  if (data.empty())
-    throw std::runtime_error("Your file is empty");
   if (data.at("items").empty())
     throw std::runtime_error("No items in file");
   if (data.at("_meta").empty())

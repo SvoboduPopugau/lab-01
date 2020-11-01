@@ -54,7 +54,8 @@ TEST(Print, All_is_Correct) {
 | Sidorov Ivan  | 31     | 4    | C++     |
 |---------------|--------|------|---------|
 | Pertov Nikita | IU8-31 | 3.33 | 3 items |
-|---------------|--------|------|---------|)";
+|---------------|--------|------|---------|
+)";
     EXPECT_EQ(List.print(),res_string);
 }
 TEST(AddData,Correctfile){
@@ -109,26 +110,12 @@ TEST(AddData,UncorrectFile){
     EXPECT_EQ(err.what(),res_str);
   }
 }
-TEST(AddData,Emptyfile){
-  std::string res_str = "Your file is empty";
-  std::ofstream testFile;
-  testFile.open("json_file.json");
-  testFile.close();
-  try{
-    MyJsonParse List;
-    std::string str = "json_fil.json";
-    List.set_data(str);
-  }
-  catch (std::runtime_error& err) {
-    EXPECT_EQ(err.what(),res_str);
-  }
-}
 TEST(AddData,EmptyItems){
   std::string res_str = "No items in file";
 
   std:: string test_string = \
  R"({
-  "items":
+  "items":[],
   "_meta": {
     "count": 3
   }
@@ -174,7 +161,7 @@ TEST(AddData,EmptyMeta){
       ]
     }
   ],
-  "_meta":
+  "_meta":[]
 })";
   std::ofstream testFile;
   testFile.open("json_file.json");
@@ -193,7 +180,30 @@ TEST(AddData,EmptyMeta){
 TEST(SetCount,AllCorrect){
   std:: string test_string = \
  R"({
-  "items":
+  "items": [
+    {
+      "name": "Ivanov Petr",
+      "group": "1",
+      "avg": "4.25",
+      "debt": null
+    },
+    {
+      "name": "Sidorov Ivan",
+      "group": 31,
+      "avg": 4,
+      "debt": "C++"
+    },
+    {
+      "name": "Pertov Nikita",
+      "group": "IU8-31",
+      "avg": 3.33,
+      "debt": [
+        "C++",
+        "Linux",
+        "Network"
+      ]
+    }
+  ],
   "_meta": {
     "count": 3
   }
@@ -215,18 +225,24 @@ TEST(GetName,AllCorrect){
   "avg": "4.25",
   "debt": null
 })");
+
   std::string res_string = "Ivanov Petr";
-  EXPECT_EQ(res_string,MyJsonParse::get_name(js));
+  EXPECT_EQ(res_string,MyJsonParse::get_name(js.at("name")));
 }
 TEST(GetName,NameNoString){
   json js = json::parse(R"({
-  "name": "Ivanov Petr",
+  "name": 12,
   "group": "1",
   "avg": "4.25",
   "debt": null
 })");
   std::string res_string = "Invalid expression in name";
-  EXPECT_EQ(res_string,MyJsonParse::get_name(js));
+  try {
+    MyJsonParse::get_name(js.at("name"));
+  }
+  catch (std::runtime_error& err) {
+    EXPECT_EQ(err.what(),res_string);
+  }
 }
 TEST(GetAvg,StringAvg){
   json js = json::parse(R"({
@@ -236,16 +252,18 @@ TEST(GetAvg,StringAvg){
   "debt": null
 })");
   std::string res_string = "4.25";
-  EXPECT_EQ(res_string,std::any_cast<std::string>(MyJsonParse::get_avg(js)));
+  EXPECT_EQ(res_string,
+            std::any_cast<std::string>(MyJsonParse::get_avg(js.at("avg"))));
 }
 TEST(GetAvg,NullAvg){
   json js = json::parse(R"({
   "name": "Ivanov Petr",
   "group": "1",
-  "avg": "null",
+  "avg": null,
   "debt": null
 })");
-  EXPECT_EQ(nullptr,std::any_cast<std::nullptr_t>(MyJsonParse::get_avg(js)));
+  EXPECT_EQ(nullptr,
+           std::any_cast<std::nullptr_t>(MyJsonParse::get_avg(js.at("avg"))));
 }
 TEST(GetAvg,DoubleAvg){
   json js = json::parse(R"({
@@ -254,7 +272,8 @@ TEST(GetAvg,DoubleAvg){
   "avg": 4.25,
   "debt": null
 })");
-  EXPECT_EQ(4.25,std::any_cast<double>(MyJsonParse::get_avg(js)));
+  EXPECT_EQ(4.25,
+            std::any_cast<double>(MyJsonParse::get_avg(js.at("avg"))));
 }
 TEST(GetAvg,Size_tAvg){
   json js = json::parse(R"({
@@ -263,7 +282,8 @@ TEST(GetAvg,Size_tAvg){
   "avg": 4,
   "debt": null
 })");
-  EXPECT_EQ(4,std::any_cast<size_t>(MyJsonParse::get_avg(js)));
+  EXPECT_EQ(4,
+            std::any_cast<size_t>(MyJsonParse::get_avg(js.at("avg"))));
 }
 TEST(GetGroup,Size_tGroup){
   json js = json::parse(R"({
@@ -272,7 +292,8 @@ TEST(GetGroup,Size_tGroup){
   "avg": 4,
   "debt": null
 })");
-  EXPECT_EQ(1,std::any_cast<size_t>(MyJsonParse::get_group(js)));
+  EXPECT_EQ(1,
+            std::any_cast<size_t>(MyJsonParse::get_group(js.at("group"))));
 }
 TEST(GetGroup,NullGroup){
   json js = json::parse(R"({
@@ -281,7 +302,7 @@ TEST(GetGroup,NullGroup){
   "avg": 4,
   "debt": null
 })");
-  std::any res = MyJsonParse::get_group(js);
+  std::any res = MyJsonParse::get_group(js.at("group"));
   EXPECT_EQ(nullptr,std::any_cast<std::nullptr_t>(res));
 }
 TEST(GetGroup,StringGroup){
@@ -292,7 +313,8 @@ TEST(GetGroup,StringGroup){
   "debt": null
 })");
   std::string res_str = "10";
-  EXPECT_EQ(res_str,std::any_cast<std::string>(MyJsonParse::get_group(js)));
+  std::any res = MyJsonParse::get_group(js.at("group"));
+  EXPECT_EQ(res_str, std::any_cast<std::string>(res));
 }
 TEST(GetDebt,NullDebt){
   json js = json::parse(R"({
@@ -301,7 +323,7 @@ TEST(GetDebt,NullDebt){
   "avg": 4,
   "debt": null
 })");
-  std::any res = MyJsonParse::get_debt(js);
+  std::any res = MyJsonParse::get_debt(js.at("debt"));
   EXPECT_EQ(nullptr,std::any_cast<std::nullptr_t>(res));
 }
 TEST(GetDebt,StringDebt){
@@ -311,7 +333,7 @@ TEST(GetDebt,StringDebt){
   "avg": 4,
   "debt": "C++"
 })");
-  std::any res = MyJsonParse::get_debt(js);
+  std::any res = MyJsonParse::get_debt(js.at("debt"));
   std::string res_str = "C++";
   EXPECT_EQ(res_str,std::any_cast<std::string>(res));
 }
@@ -326,7 +348,7 @@ TEST(GetDebt,VectorDebt){
         "Network"
       ]
 })");
-  std::any res = MyJsonParse::get_debt(js);
+  std::any res = MyJsonParse::get_debt(js.at("debt"));
   std::vector<std::string> res_vec{"C++","Linux","Network"};
   EXPECT_EQ(res_vec,std::any_cast<std::vector<std::string>>(res));
 }
@@ -395,12 +417,14 @@ TEST(FromJson,ArrSizeNotMeta) {
   }
 }
 TEST(Convertation, Fromstring){
-  std::any a = "Hey";
+  std::string str = "Hey";
+  std::any a = str;
   std::string res_str = "Hey";
   EXPECT_EQ(res_str,MyJsonParse::convert_to_string(a));
 }
 TEST(Convertation, FromInt){
-  std::any a = 12;
+  std::size_t integer = 12;
+  std::any a = integer;
   std::string res_str = "12";
   EXPECT_EQ(res_str,MyJsonParse::convert_to_string(a));
 }
@@ -410,9 +434,9 @@ TEST(Convertation, FromDouble){
   EXPECT_EQ(res_str,MyJsonParse::convert_to_string(a));
 }
 TEST(Convertation, FromVector){
-  std::vector<std::string> vec{"C++,Linux"};
+  std::vector<std::string> vec{"C++","Linux"};
   std::any a = vec;
-  std::string res_str = "2 Items";
+  std::string res_str = "2 items";
   EXPECT_EQ(res_str,MyJsonParse::convert_to_string(a));
 }
 TEST(Convertation, FromNull){
