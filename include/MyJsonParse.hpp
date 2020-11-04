@@ -58,7 +58,6 @@ class MyJsonParse {
 
     private:
     json data;
-//    std::string MyTestString;
     Students* StudList;
 };
 #endif  // INCLUDE_MYJSONPARSE_HPP_

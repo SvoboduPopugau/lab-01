@@ -20,7 +20,6 @@ void MyJsonParse::set_data(std::string& s)
 {
   std::ifstream file;
   file.open(s);
-//  this->data = json::parse(file);
 
   if (!file)
     throw std::runtime_error("Unable to open file: " + s);
@@ -95,7 +94,6 @@ void MyJsonParse::from_json() {
     throw std::runtime_error{"content of _meta != real count of items"};
   if (this->StudList->Items.empty() && get_count() != 0) {
     for (int i = 0; i < get_count(); i++) {
-//      std::cout << ItemsVec[i] << std::endl;
       item_fjson(ItemsVec[i]);
     }
   }
@@ -112,12 +110,10 @@ std::string MyJsonParse::print()
   for (size_t i = 0; i < arr_size; i++)
   {
     Item* tmp = this->StudList->Items[i];
-//    std::cout <<"Name " << i << " :"<< tmp->name;
     if (tmp->name.length() > nMax) {
       nMax = tmp->name.length();
     }
 
-//    std::cout <<" |Group " << i << ":"<< tmp->avg.type().name();
     if (convert_to_string(tmp->group) == "bad_any_cast") {
       throw std::runtime_error{"Incorrect type group"};
     }
@@ -125,7 +121,6 @@ std::string MyJsonParse::print()
       gMax = convert_to_string(tmp->group).length();
     }
 
-//    std::cout <<" |Avg " << i << ":"<< tmp->avg.type().name();
     if (convert_to_string(tmp->avg) == "bad_any_cast") {
       throw std::runtime_error{"Incorrect type avg"};
     }
@@ -137,7 +132,6 @@ std::string MyJsonParse::print()
       throw std::runtime_error{"Incorrect type debt"};
     if (convert_to_string(tmp->debt).length() > dMax)
       dMax = convert_to_string(tmp->debt).length();
-//    std::cout <<" |Debt " << i << ":"<< tmp->debt.type().name() << std::endl;
   }
   std::string sep;
   sep += "|";
@@ -207,16 +201,12 @@ std::string MyJsonParse::convert_to_string(const std::any& any) {
   {
     std::stringstream ret;
     ret << std::any_cast<size_t>(any);
-//    std::string my_string;
-//    ret >> my_string;
     return ret.str();
   }
   if (!strcmp(any.type().name(), "d"))
   {
     std::stringstream ret;
     ret << std::any_cast<double>(any);
-//    std::string my_string;
-//    ret >> my_string;
     return ret.str();
   }
   if (!strcmp(any.type().name(),
@@ -224,9 +214,7 @@ std::string MyJsonParse::convert_to_string(const std::any& any) {
   {
     size_t ret = std::any_cast<std::vector<std::string> >(any).size();
     std::stringstream my_stream;
-//    std::string my_string;
     my_stream << ret;
-//    my_stream >> my_string;
     return my_stream.str() + " items";
   }
   if (!strcmp(any.type().name(), "Dn"))
