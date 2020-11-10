@@ -54,8 +54,6 @@ class MyJsonParse {
 
      std::string print();
 
-     void add_item(struct Item& New);
-
     private:
     json data;
     Students* StudList;

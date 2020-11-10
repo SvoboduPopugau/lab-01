@@ -223,11 +223,6 @@ std::string MyJsonParse::convert_to_string(const std::any& any) {
   }
   return "bad_any_cast";
 }
-void MyJsonParse::add_item(struct Item& New)
-{
-    StudList->Items.push_back(&New);
-    StudList->_meta.count++;
-}
 Students* MyJsonParse::get_Studlist() {
   return StudList;
 }
